@@ -17,14 +17,14 @@ export default async function SendMessagePage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50">
+      <div className="w-full max-w-2xl">
+        <div className="text-center mb-6 sm:mb-8 px-4">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">
             Send Anonymous Message
           </h1>
-          <p className="text-muted-foreground">
-            to <span className="font-semibold">{profile.display_name}</span>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            to <span className="font-semibold break-words">{profile.display_name}</span>
           </p>
         </div>
         

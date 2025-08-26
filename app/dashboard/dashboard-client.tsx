@@ -38,9 +38,9 @@ export default function DashboardClient({ profile, messages }: DashboardClientPr
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Welcome back, {profile.display_name}!</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Welcome back, {profile.display_name}!</h1>
             <p className="text-muted-foreground">Manage your anonymous messages</p>
           </div>
         </div>
@@ -57,18 +57,20 @@ export default function DashboardClient({ profile, messages }: DashboardClientPr
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 p-3 bg-muted rounded-lg font-mono text-sm">
+            <div className="space-y-3">
+              <div className="p-3 bg-muted rounded-lg font-mono text-sm break-all">
                 {shareLink}
               </div>
-              <Button onClick={copyToClipboard} variant="outline" size="sm">
-                <Copy className="h-4 w-4" />
-                {copied ? 'Copied!' : 'Copy'}
-              </Button>
-              <Button onClick={openLink} variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4" />
-                Open
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button onClick={copyToClipboard} variant="outline" size="sm" className="flex-1 sm:flex-none">
+                  <Copy className="h-4 w-4 mr-2" />
+                  {copied ? 'Copied!' : 'Copy'}
+                </Button> 
+                <Button onClick={openLink} variant="outline" size="sm" className="flex-1 sm:flex-none">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -97,7 +99,7 @@ export default function DashboardClient({ profile, messages }: DashboardClientPr
                     key={message.id}
                     className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                       <Badge variant="secondary">Anonymous</Badge>
                       <span className="text-xs text-muted-foreground">
                         {new Date(message.created_at).toLocaleDateString('id-ID', {
