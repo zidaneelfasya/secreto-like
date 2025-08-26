@@ -11,6 +11,9 @@ export interface Message {
   id: string;
   recipient_id: string;
   content: string;
+  sender_ip: string | null;
+  sender_user_agent: string | null;
+  sender_location: string | null;
   created_at: string;
 }
 

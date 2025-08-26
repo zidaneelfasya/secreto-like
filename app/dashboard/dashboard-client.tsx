@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Copy, ExternalLink, MessageSquare } from 'lucide-react';
+import SenderHint from '@/components/sender-hint';
 
 interface DashboardClientProps {
   profile: Profile;
@@ -108,7 +109,8 @@ export default function DashboardClient({ profile, messages }: DashboardClientPr
                         })}
                       </span>
                     </div>
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <p className="text-sm leading-relaxed mb-3">{message.content}</p>
+                    <SenderHint message={message} />
                   </div>
                 ))}
               </div>

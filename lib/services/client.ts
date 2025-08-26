@@ -11,6 +11,9 @@ export interface Message {
   id: string;
   recipient_id: string;
   content: string;
+  sender_ip: string | null;
+  sender_user_agent: string | null;
+  sender_location: string | null;
   created_at: string;
 }
 
@@ -39,18 +42,23 @@ export const profileServiceClient = {
 
 export const messageService = {
   async sendMessage(recipientId: string, content: string): Promise<Message | null> {
-    const supabase = createClient();
-    
-    const { data, error } = await supabase
-      .from('messages')
-      .insert({
-        recipient_id: recipientId,
+    const response = await fetch('/api/send-message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        recipientId,
         content,
-      })
-      .select()
-      .single();
+      }),
+    });
 
-    if (error) throw error;
-    return data;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to send message');
+    }
+
+    const result = await response.json();
+    return result.data;
   }
 };

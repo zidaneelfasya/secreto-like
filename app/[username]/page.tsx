@@ -18,7 +18,7 @@ export default async function UserProfilePage({ params }: PageProps) {
     notFound();
   }
 
-  const messageLink = `/${profile.username}/${profile.message_link_uuid}`;
+  const messageLink = `/${profile.username}/${profile.id}`;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
