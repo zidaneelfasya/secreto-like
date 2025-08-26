@@ -63,7 +63,7 @@ export default function CreateProfile() {
                 disabled={isLoading}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                This will be part of your link: secreto.com/{username}
+                This will be part of your link: secreto-like.vercel.app/{username}
               </p>
             </div>
             
