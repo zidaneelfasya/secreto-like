@@ -55,10 +55,14 @@ export default function SendMessageForm({ recipientId, recipientName }: SendMess
       if (err instanceof Error) {
         if (err.message.includes('Network error')) {
           errorMessage = 'Network error. Please check your connection and try again.';
-        } else if (err.message.includes('Invalid JSON')) {
-          errorMessage = 'There was a problem with your message format. Please try again.';
+        } else if (err.message.includes('Empty response')) {
+          errorMessage = 'Server connection error. Please try again in a moment.';
+        } else if (err.message.includes('Invalid response')) {
+          errorMessage = 'Server communication error. Please refresh and try again.';
         } else if (err.message.includes('Invalid recipient ID')) {
           errorMessage = 'Invalid recipient. Please check the link and try again.';
+        } else if (err.message.includes('fetch')) {
+          errorMessage = 'Connection failed. Please check your internet and try again.';
         } else {
           errorMessage = err.message;
         }

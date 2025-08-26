@@ -55,11 +55,19 @@ export const messageService = {
         }),
       });
 
+      // Check if response is empty
+      const responseText = await response.text();
+
+      if (!responseText) {
+        throw new Error('Empty response from server');
+      }
+
       let responseData;
       try {
-        responseData = await response.json();
+        responseData = JSON.parse(responseText);
       } catch (jsonError) {
         console.error('Failed to parse response JSON:', jsonError);
+        console.error('Raw response:', responseText);
         throw new Error('Invalid response from server');
       }
 
@@ -69,6 +77,8 @@ export const messageService = {
 
       return responseData.data;
     } catch (error) {
+      console.error('Send message error:', error);
+      
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error('Network error. Please check your connection and try again.');
       }

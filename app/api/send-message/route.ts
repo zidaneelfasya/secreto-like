@@ -1,11 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateMessageContent, validateRecipientId, sanitizeMessage } from '@/lib/validation';
-import { getClientIP, getLocationFromHeaders, logRequestInfo } from '@/lib/ip-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    
     // Check content type
     const contentType = request.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
@@ -14,7 +12,8 @@ export async function POST(request: NextRequest) {
 
     let body;
     try {
-      body = await request.json();
+      const rawBody = await request.text();
+      body = JSON.parse(rawBody);
     } catch (jsonError) {
       console.error('JSON parsing error:', jsonError);
       return NextResponse.json({ error: 'Invalid JSON format' }, { status: 400 });
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest) {
       .from('messages')
       .insert({
         recipient_id: recipientId,
-        content: content.trim(),
+        content: sanitizedContent,
         sender_ip: ip,
         sender_user_agent: userAgent,
         sender_location: location,
@@ -67,9 +66,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
     }
 
-    return NextResponse.json({ message: 'Message sent successfully', data });
+    return NextResponse.json({ 
+      message: 'Message sent successfully', 
+      data,
+      success: true 
+    }, { 
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
   } catch (error) {
     console.error('Server error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
   }
 }
