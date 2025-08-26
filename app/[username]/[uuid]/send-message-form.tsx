@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { messageService } from '@/lib/services/client';
+import { validateMessageContent, validateRecipientId, sanitizeMessage } from '@/lib/validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -24,30 +25,45 @@ export default function SendMessageForm({ recipientId, recipientName }: SendMess
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!message.trim()) {
-      setError('Please write a message');
+    // Validate recipient ID
+    const recipientValidation = validateRecipientId(recipientId);
+    if (!recipientValidation.isValid) {
+      setError(recipientValidation.error || 'Invalid recipient');
       return;
     }
 
-    if (message.trim().length < 1) {
-      setError('Message is too short');
+    // Validate message content
+    const contentValidation = validateMessageContent(message);
+    if (!contentValidation.isValid) {
+      setError(contentValidation.error || 'Invalid message');
       return;
     }
 
-    if (message.trim().length > 1000) {
-      setError('Message is too long (max 1000 characters)');
-      return;
-    }
+    const sanitizedMessage = sanitizeMessage(message);
 
     setIsLoading(true);
     setError('');
 
     try {
-      await messageService.sendMessage(recipientId, message.trim());
+      await messageService.sendMessage(recipientId, sanitizedMessage);
       setIsSent(true);
       setMessage('');
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
+      console.error('Send message error:', err);
+      let errorMessage = 'Failed to send message';
+      
+      if (err instanceof Error) {
+        if (err.message.includes('Network error')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (err.message.includes('Invalid JSON')) {
+          errorMessage = 'There was a problem with your message format. Please try again.';
+        } else if (err.message.includes('Invalid recipient ID')) {
+          errorMessage = 'Invalid recipient. Please check the link and try again.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
       setError(errorMessage);
     } finally {
       setIsLoading(false);

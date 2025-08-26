@@ -8,12 +8,15 @@ function isPublicUsernamePage(pathname: string): boolean {
   if (pathname === "/") return true;
   
   // Check if it's a username profile page: /[username] (but not /dashboard, /create-profile, etc.)
-  const usernameRegex = /^\/[a-zA-Z0-9_]+$/;
+  const usernameRegex = /^\/[a-zA-Z0-9_-]+$/;
   if (usernameRegex.test(pathname)) return true;
   
-  // Check if it's a message page: /[username]/[uuid]
-  const messageRegex = /^\/[a-zA-Z0-9_]+\/[a-fA-F0-9\-]{36}$/;
+  // Check if it's a message page: /[username]/[uuid] - more flexible UUID pattern
+  const messageRegex = /^\/[a-zA-Z0-9_-]+\/[a-fA-F0-9-]{36}$/;
   if (messageRegex.test(pathname)) return true;
+  
+  // Allow API routes for sending messages
+  if (pathname.startsWith('/api/send-message')) return true;
   
   return false;
 }

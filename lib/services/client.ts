@@ -42,23 +42,37 @@ export const profileServiceClient = {
 
 export const messageService = {
   async sendMessage(recipientId: string, content: string): Promise<Message | null> {
-    const response = await fetch('/api/send-message', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        recipientId,
-        content,
-      }),
-    });
+    try {
+      const response = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          recipientId,
+          content,
+        }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to send message');
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse response JSON:', jsonError);
+        throw new Error('Invalid response from server');
+      }
+
+      if (!response.ok) {
+        throw new Error(responseData.error || `Server error: ${response.status}`);
+      }
+
+      return responseData.data;
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error. Please check your connection and try again.');
+      }
+      throw error;
     }
-
-    const result = await response.json();
-    return result.data;
   }
 };

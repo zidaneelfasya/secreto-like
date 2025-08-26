@@ -1,6 +1,7 @@
 import { profileServiceServer } from '@/lib/services/server';
 import { notFound } from 'next/navigation';
 import SendMessageForm from './send-message-form';
+import ErrorBoundary from '@/components/error-boundary';
 
 interface PageProps {
   params: Promise<{ username: string; uuid: string }>;
@@ -27,7 +28,9 @@ export default async function SendMessagePage({ params }: PageProps) {
           </p>
         </div>
         
-        <SendMessageForm recipientId={profile.id} recipientName={profile.display_name || profile.username} />
+        <ErrorBoundary>
+          <SendMessageForm recipientId={profile.id} recipientName={profile.display_name || profile.username} />
+        </ErrorBoundary>
       </div>
     </div>
   );

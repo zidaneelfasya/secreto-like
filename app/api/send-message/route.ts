@@ -1,13 +1,40 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { validateMessageContent, validateRecipientId, sanitizeMessage } from '@/lib/validation';
+import { getClientIP, getLocationFromHeaders, logRequestInfo } from '@/lib/ip-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const { recipientId, content } = await request.json();
     
-    if (!recipientId || !content) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // Check content type
+    const contentType = request.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 400 });
     }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (jsonError) {
+      console.error('JSON parsing error:', jsonError);
+      return NextResponse.json({ error: 'Invalid JSON format' }, { status: 400 });
+    }
+
+    const { recipientId, content } = body;
+    
+    // Validate recipient ID
+    const recipientValidation = validateRecipientId(recipientId);
+    if (!recipientValidation.isValid) {
+      return NextResponse.json({ error: recipientValidation.error }, { status: 400 });
+    }
+    
+    // Validate and sanitize content
+    const contentValidation = validateMessageContent(content);
+    if (!contentValidation.isValid) {
+      return NextResponse.json({ error: contentValidation.error }, { status: 400 });
+    }
+
+    const sanitizedContent = sanitizeMessage(content);
 
     // Get sender information
     const forwarded = request.headers.get('x-forwarded-for');

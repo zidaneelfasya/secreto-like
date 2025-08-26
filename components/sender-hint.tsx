@@ -74,7 +74,7 @@ export default function SenderHint({ message }: SenderHintProps) {
                 </div>
               )}
               
-              {message.sender_location && message.sender_location !== 'unknown' && (
+              {/* {message.sender_location && message.sender_location !== 'unknown' && (
                 <div className="flex items-center gap-2">
                   <MapPin className="h-3 w-3 text-orange-500" />
                   <span className="font-medium">Location:</span>
@@ -82,7 +82,7 @@ export default function SenderHint({ message }: SenderHintProps) {
                     {message.sender_location}
                   </Badge>
                 </div>
-              )}
+              )} */}
             </div>
             
             <div className="pt-2 border-t text-xs text-muted-foreground">
