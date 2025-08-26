@@ -4,19 +4,47 @@ import { validateMessageContent, validateRecipientId, sanitizeMessage } from '@/
 
 export async function POST(request: NextRequest) {
   try {
+    // Log request info for debugging mobile issues
+    console.log('API Request:', {
+      method: request.method,
+      url: request.url,
+      userAgent: request.headers.get('user-agent'),
+      contentType: request.headers.get('content-type')
+    });
+
     // Check content type
     const contentType = request.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
-      return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 400 });
+      console.log('Invalid content type:', contentType);
+      return new NextResponse(JSON.stringify({ error: 'Content-Type must be application/json' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     let body;
     try {
-      const rawBody = await request.text();
+      // Clone the request to avoid "body already read" errors
+      const requestClone = request.clone();
+      const rawBody = await requestClone.text();
+      console.log('Raw body received:', rawBody?.substring(0, 100) + '...');
+      
+      if (!rawBody || rawBody.trim() === '') {
+        console.log('Empty body received');
+        return new NextResponse(JSON.stringify({ error: 'Empty request body' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      
       body = JSON.parse(rawBody);
+      console.log('Body parsed successfully:', { recipientId: body.recipientId, contentLength: body.content?.length });
     } catch (jsonError) {
       console.error('JSON parsing error:', jsonError);
-      return NextResponse.json({ error: 'Invalid JSON format' }, { status: 400 });
+      return new NextResponse(JSON.stringify({ error: 'Invalid JSON format' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const { recipientId, content } = body;
@@ -24,13 +52,19 @@ export async function POST(request: NextRequest) {
     // Validate recipient ID
     const recipientValidation = validateRecipientId(recipientId);
     if (!recipientValidation.isValid) {
-      return NextResponse.json({ error: recipientValidation.error }, { status: 400 });
+      return new NextResponse(JSON.stringify({ error: recipientValidation.error }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
     
     // Validate and sanitize content
     const contentValidation = validateMessageContent(content);
     if (!contentValidation.isValid) {
-      return NextResponse.json({ error: contentValidation.error }, { status: 400 });
+      return new NextResponse(JSON.stringify({ error: contentValidation.error }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const sanitizedContent = sanitizeMessage(content);
@@ -63,25 +97,32 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Database error:', error);
-      return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
+      return new NextResponse(JSON.stringify({ error: 'Failed to send message' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    return NextResponse.json({ 
+    console.log('Message sent successfully');
+    return new NextResponse(JSON.stringify({ 
       message: 'Message sent successfully', 
       data,
       success: true 
-    }, { 
+    }), { 
       status: 200,
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     });
   } catch (error) {
     console.error('Server error:', error);
-    return NextResponse.json({ 
+    return new NextResponse(JSON.stringify({ 
       error: 'Internal server error',
       details: error instanceof Error ? error.message : 'Unknown error'
-    }, { 
+    }), { 
       status: 500,
       headers: {
         'Content-Type': 'application/json',

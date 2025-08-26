@@ -7,6 +7,9 @@ function isPublicUsernamePage(pathname: string): boolean {
   // Check if it's the root path
   if (pathname === "/") return true;
   
+  // Check if it's debug page
+  if (pathname === "/debug") return true;
+  
   // Check if it's a username profile page: /[username] (but not /dashboard, /create-profile, etc.)
   const usernameRegex = /^\/[a-zA-Z0-9_-]+$/;
   if (usernameRegex.test(pathname)) return true;
@@ -15,8 +18,10 @@ function isPublicUsernamePage(pathname: string): boolean {
   const messageRegex = /^\/[a-zA-Z0-9_-]+\/[a-fA-F0-9-]{36}$/;
   if (messageRegex.test(pathname)) return true;
   
-  // Allow API routes for sending messages
+  // Allow API routes for sending messages and testing
   if (pathname.startsWith('/api/send-message')) return true;
+  if (pathname.startsWith('/api/test-mobile')) return true;
+  if (pathname.startsWith('/api/mobile-debug')) return true;
   
   return false;
 }
