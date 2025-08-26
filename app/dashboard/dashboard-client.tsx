@@ -17,8 +17,8 @@ export default function DashboardClient({ profile, messages }: DashboardClientPr
   const [shareLink, setShareLink] = useState('');
   
   useEffect(() => {
-    setShareLink(`${window.location.origin}/${profile.username}`);
-  }, [profile.username]);
+    setShareLink(`${window.location.origin}/${profile.username}/${profile.id}`);
+  }, [profile.username, profile.id]);
 
   const copyToClipboard = async () => {
     try {

@@ -42,6 +42,20 @@ export const profileServiceServer = {
     return data;
   },
 
+  async getProfileByUsernameAndUuid(username: string, profileUuid: string): Promise<Profile | null> {
+    const supabase = await createServerClient();
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('username', username)
+      .eq('id', profileUuid)
+      .single();
+
+    if (error) return null;
+    return data;
+  },
+
   async getUserMessages(userId: string): Promise<Message[]> {
     const supabase = await createServerClient();
     

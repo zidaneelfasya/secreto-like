@@ -2,6 +2,22 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
+// Helper function to check if a path is a public username page
+function isPublicUsernamePage(pathname: string): boolean {
+  // Check if it's the root path
+  if (pathname === "/") return true;
+  
+  // Check if it's a username profile page: /[username] (but not /dashboard, /create-profile, etc.)
+  const usernameRegex = /^\/[a-zA-Z0-9_]+$/;
+  if (usernameRegex.test(pathname)) return true;
+  
+  // Check if it's a message page: /[username]/[uuid]
+  const messageRegex = /^\/[a-zA-Z0-9_]+\/[a-fA-F0-9\-]{36}$/;
+  if (messageRegex.test(pathname)) return true;
+  
+  return false;
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -48,10 +64,10 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   if (
-    request.nextUrl.pathname !== "/" &&
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    !request.nextUrl.pathname.startsWith("/auth") &&
+    !isPublicUsernamePage(request.nextUrl.pathname)
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
