@@ -27,9 +27,14 @@ export function getClientIP(request: NextRequest): string {
   }
 
   // Fallback to connection remote address (usually not available in serverless)
-  const connectionIP = (request as any).ip || (request as any).connection?.remoteAddress;
-  if (connectionIP && isValidIP(connectionIP)) {
-    return cleanIP(connectionIP);
+  try {
+    const connectionIP = (request as unknown as Record<string, unknown>).ip || 
+                        ((request as unknown as Record<string, unknown>).connection as Record<string, unknown>)?.remoteAddress;
+    if (connectionIP && typeof connectionIP === 'string' && isValidIP(connectionIP)) {
+      return cleanIP(connectionIP);
+    }
+  } catch {
+    // Ignore connection IP extraction errors
   }
 
   return 'unknown';
@@ -64,7 +69,7 @@ export function getLocationFromHeaders(request: NextRequest): string {
   // Try to get location from various headers
   const cfCountry = request.headers.get('cf-ipcountry'); // Cloudflare country
   const acceptLanguage = request.headers.get('accept-language');
-  const cfTimezone = request.headers.get('cf-timezone'); // Cloudflare timezone
+  // const cfTimezone = request.headers.get('cf-timezone'); // Cloudflare timezone - commented out as unused
   
   if (cfCountry) {
     return cfCountry;

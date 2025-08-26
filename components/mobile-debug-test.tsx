@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 export default function MobileDebugTest() {
   const [message, setMessage] = useState('Test message from mobile');
   const [recipientId, setRecipientId] = useState('test-recipient-id');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const testEndpoint = async (endpoint: string) => {

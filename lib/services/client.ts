@@ -83,7 +83,7 @@ export const messageService = {
           } else {
             throw new Error(`Server error: ${response.status} - ${response.statusText}`);
           }
-        } catch (parseError) {
+        } catch {
           throw new Error(`Server error: ${response.status} - ${response.statusText}`);
         }
       }

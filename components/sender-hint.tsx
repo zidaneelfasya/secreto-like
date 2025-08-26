@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Info, Globe, Monitor, MapPin } from 'lucide-react';
+import { Info, Globe, Monitor } from 'lucide-react';
 import { Message } from '@/lib/services/client';
 import { UAParser } from 'ua-parser-js';
 
