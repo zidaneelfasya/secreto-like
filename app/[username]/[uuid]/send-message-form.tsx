@@ -99,7 +99,7 @@ export default function SendMessageForm({ recipientId, recipientName }: SendMess
                 Send Another Message
               </Button>
               <Button
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/auth/login')}
                 variant="default"
                 className="w-full h-11"
               >
